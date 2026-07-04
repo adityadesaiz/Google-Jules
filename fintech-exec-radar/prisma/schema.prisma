@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Opportunity {
+  id              String   @id @default(uuid())
+  title           String
+  company         String
+  location        String
+  url             String?
+  rawDescription  String   @db.Text
+  cleanDescription String?  @db.Text
+
+  matchScore      Int      @default(0)
+  matchPros       String[] // JSON array of pros
+  matchCons       String[] // JSON array of cons
+  coreTags        String[] // E.g. #Databricks, #FinOps
+
+  status          String   @default("Discovered") // Discovered, Shortlisted, Applied, Interviewing, Offer
+  statusDays      Int      @default(0)
+
+  // Derived predictive data
+  hiddenAssets    String[]
+  frictionPoints  String[]
+
+  // Modified Resume impacts
+  resumeTweaks    String?  @db.Text
+  executivePitch  String?  @db.Text
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  action      String
+  details     String?  @db.Text
+  createdAt   DateTime @default(now())
+}
+
+model StrategyAlert {
+  id          String   @id @default(uuid())
+  type        String // e.g. "trend", "warning"
+  message     String   @db.Text
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
